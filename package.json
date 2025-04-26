@@ -9,7 +9,11 @@
     "build": "nest build",
     "test": "jest",
     "test:watch": "jest --watch",
-    "postinstall": "npm install @nestjs/config @nestjs/typeorm typeorm mysql2"
+    "postinstall": "npm install @nestjs/config @nestjs/typeorm typeorm mysql2",
+    "use:dev": "cp .env.development .env",
+    "use:prod": "cp .env.production .env",
+    "use:test": "cp .env.test .env",
+    "start:prod": "NODE_ENV=production node dist/main.js"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -19,6 +23,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "moment-timezone": "^0.5.48",
     "mysql2": "^3.14.0",
     "typeorm": "^0.3.22"
   },
@@ -26,6 +31,7 @@
     "@nestjs/cli": "^11.0.6",
     "@nestjs/schematics": "^9.0.0",
     "@types/jest": "^26.0.0",
+    "@types/moment-timezone": "^0.5.13",
     "@types/node": "^14.0.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.3.2",
