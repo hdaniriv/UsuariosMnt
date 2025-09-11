@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { AppBaseEntity } from '../../common/entities/base.entity';
+import { AppBaseEntity } from './base.entity';
 
 
 @Entity('usuarios')

@@ -2,17 +2,25 @@ import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode } from '@nest
 import { UsuariosService } from './usuarios.service';
 import { CreateUsuarioDto } from './dtos/create-usuario.dto';
 import { UpdateUsuarioDto } from './dtos/update-usuario.dto';
+import { ApiBody,ApiTags, ApiOperation } from '@nestjs/swagger';
 
 @Controller('usuarios')
+@ApiTags('usuarios  end point cito')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Crear un nuevo usuario' })
+  @ApiBody({
+    description: 'Datos necesarios para crear un usuario',
+    type: CreateUsuarioDto,
+  })
   create(@Body() createUsuarioDto: CreateUsuarioDto) {
     return this.usuariosService.create(createUsuarioDto);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Lista todos los usuarios' })
   findAll() {
     return this.usuariosService.findAll();
   }

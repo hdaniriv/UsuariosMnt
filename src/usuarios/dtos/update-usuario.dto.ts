@@ -1,9 +1,8 @@
-import { IsNotEmpty } from 'class-validator';
+import { PartialType, OmitType } from "@nestjs/swagger";
+import { CreateUsuarioDto } from "./create-usuario.dto";
 
-export class UpdateUsuarioDto {
-  @IsNotEmpty({ message: 'El nombre no puede estar vacío' })
-  name?: string;
 
-  @IsNotEmpty({ message: 'El password no puede estar vacío' })
-  password?: string;
-}
+// Eliminar la propiedad "password" de CreateUsuarioDto
+export class UpdateUsuarioDto extends PartialType(
+  OmitType(CreateUsuarioDto, ["password"] as const)
+) {}

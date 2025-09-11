@@ -3,7 +3,7 @@
   "host": "localhost",
   "port": 3306,
   "username": "root",
-  "password": "password", // Cambia esto por tu contraseña
+  "password": "password", 
   "database": "user_mnt_dev",
   "synchronize": true,
   "logging": false,

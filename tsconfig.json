@@ -9,8 +9,14 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "baseUrl": ".",
+    "paths": {
+      "@entities/*": ["src/database/entities/*"],
+      "@db": ["src/database"]
+    }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*.ts","src"],
+  "exclude": ["node_modules", "dist"],
+ 
 }
