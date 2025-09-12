@@ -28,7 +28,7 @@ export class UsuariosController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const usuario = await this.usuariosService.findOne(Number(id));
-   /*  toda la logica y las excepciones se manejan en el servicio*/
+    /*  toda la logica y las excepciones se manejan en el servicio*/
     return usuario;
   }
 
