@@ -47,6 +47,11 @@ To start the application, run:
 npm run start
 ```
 
+To start the application in dev mode, run:
+```
+npm run start:dev
+```
+
 The application will be available at `http://localhost:3000`.
 
 ## API Endpoints
