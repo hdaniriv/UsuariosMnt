@@ -2,6 +2,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { UsuarioEntity } from './entities/usuario.entity';
 import { ProductoEntity } from './entities/producto.entity';
+import { ProductoCategoriaEntity } from './entities/productoCategoria.entity';
 
 ConfigModule.forRoot({
   isGlobal: true, // Hace que las variables estén disponibles globalmente
@@ -17,7 +18,7 @@ export const ormConfig = {
   username: configService.get<string>('DB_USERNAME'),
   password: configService.get<string>('DB_PASSWORD'),
   database: configService.get<string>('DB_DATABASE'),
-  entities: [UsuarioEntity, ProductoEntity],
+  entities: [UsuarioEntity, ProductoEntity, ProductoCategoriaEntity],
   autoLoadEntities: true,
   synchronize: configService.get<string>('NODE_ENV') === 'development', // Solo habilita synchronize en desarrollo
   logging: configService.get<boolean>('TYPEORM_LOGGING') || false, // Controla los logs desde .env

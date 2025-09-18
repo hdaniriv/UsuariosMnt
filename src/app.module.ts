@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { DatabaseModule } from './database/database.module';
+import { InventariosModule } from './inventarios/inventarios.module';
+import { RouterModule } from '@nestjs/core';
 
 
 @Module({
@@ -12,6 +14,19 @@ import { DatabaseModule } from './database/database.module';
     }),  
     UsuariosModule,
     DatabaseModule,
-  ],
-})
+    InventariosModule,
+    RouterModule.register([
+      {
+        path: 'usuarios',
+        module: UsuariosModule,
+      },
+      {
+        path: 'inventarios',
+        module: InventariosModule,
+      },
+    ]),
+  ],  
+},
+
+)
 export class AppModule {}
