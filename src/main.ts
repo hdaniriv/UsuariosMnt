@@ -1,6 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
+import { TypeOrmExceptionFilter } from "./database/filters/typeorm-exception.filter";
 import { GlobalPostInterceptor } from "./interceptors/global-post-interceptor";
 import { ConfigService } from "@nestjs/config";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
@@ -8,34 +9,54 @@ import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Obtener el puerto desde el archivo .env usando ConfigService
+  // Obtener ConfigService
   const configService = app.get(ConfigService);
-  const port = configService.get<number>("PORT") || 3000; // Usa 3000 como valor predeterminado
 
-  // Habilitar validaciones globales con whitelist
+  // Configurar validación global
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Elimina automáticamente campos no definidos en los DTOs
-      forbidNonWhitelisted: true, // Lanza un error si se envían campos no permitidos
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
     })
   );
+
+  // 🔧 Registrar filtro global con ConfigService
+  app.useGlobalFilters(new TypeOrmExceptionFilter(configService));
 
   // Registrar un interceptor global
   app.useGlobalInterceptors(new GlobalPostInterceptor());
 
   // Configuración de Swagger
   const config = new DocumentBuilder()
-    .setTitle("User Management API")
-    .setDescription("API para gestionar usuarios y productos")
+    .setTitle("UserMnt API")
+    .setDescription("API para gestión de usuarios con autenticación JWT y roles")
     .setVersion("1.0")
-    .addBearerAuth() // Agrega soporte para autenticación con Bearer Token
+    .addBearerAuth(
+      {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        name: "JWT",
+        description: "Enter JWT token",
+        in: "header",
+      },
+      "JWT-auth"
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
 
   // Iniciar el servidor
+  const port = configService.get<number>("PORT") || 3000;
   await app.listen(port);
+  
   console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
   console.log(`📄 Documentación disponible en http://localhost:${port}/api`);
+  console.log(`🔗 Rutas: /auth, /usuarios, /inventarios`);
+  console.log(`🔐 Sistema de autenticación JWT habilitado`);
+  console.log(`👑 Para crear el primer admin, usa: npm run generate-admin`);
+  console.log(`🐞 Modo: ${configService.get('NODE_ENV')} - ${configService.get('NODE_ENV') === 'development' ? 'Errores detallados activados' : 'Errores ocultados'}`);
 }
+
 bootstrap();

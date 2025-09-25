@@ -16,17 +16,9 @@ export class CategoriasService {
         private readonly categoriaRepository: Repository<ProductoCategoriaEntity>
     ) {}
 
-    async create(data: ProductoCategoriaCreateDto): Promise<ProductoCategoriaEntity> {
-        try {
+    async create(data: ProductoCategoriaCreateDto): Promise<ProductoCategoriaEntity> {       
         const categoria = this.categoriaRepository.create(data);
-        return await this.categoriaRepository.save(categoria);
-        } catch (error) {
-        if ((error as any).code === 'ER_DUP_ENTRY') {
-            // Código de error específico de MySQL para entradas duplicadas
-            throw new ConflictException('Ya existe una categoría con ese nombre.');
-        }
-        throw error; // Lanza otros errores no manejados
-        }
+        return await this.categoriaRepository.save(categoria);       
     }
 
     async findAll(): Promise<ProductoCategoriaEntity[]> {
