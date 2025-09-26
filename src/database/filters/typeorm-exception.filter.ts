@@ -17,21 +17,21 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     
-    // 🔍 Verificar si estamos en desarrollo
+    // Verificar si estamos en desarrollo
     const isDevelopment = this.configService.get('NODE_ENV') === 'development';
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Ocurrió un error inesperado. Por favor, inténtalo más tarde.';
     let details = null;
 
-    // 🚨 EN DESARROLLO: Mostrar error completo
+    // EN DESARROLLO: Mostrar error completo
     if (isDevelopment) {
-      console.error('🔥 ERROR COMPLETO EN DESARROLLO:');
+      console.error('ERROR COMPLETO EN DESARROLLO:');
       console.error('Exception:', exception);
       console.error('Stack:', (exception as any)?.stack);
       
       if (exception instanceof QueryFailedError) {
-        console.error('🗄️ QueryFailedError details:');
+        console.error('QueryFailedError details:');
         console.error('- Code:', (exception as any).code);
         console.error('- Message:', exception.message);
         console.error('- SQL:', (exception as any).sql);
@@ -41,7 +41,6 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
 
     // TypeORM QueryFailedError
     if (exception instanceof QueryFailedError) {
-      // PostgreSQL & MySQL error codes
       switch ((exception as any).code) {
         case '23505': // unique_violation (PostgreSQL)
         case 'ER_DUP_ENTRY': // 1062 (MySQL)
@@ -68,11 +67,6 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
           message = 'Campo desconocido en la base de datos.';
           status = HttpStatus.BAD_REQUEST;
           break;
-        case '23514': // check_violation (PostgreSQL)
-        case 'ER_ROW_IS_REFERENCED_2': // 1451 (MySQL, intento de borrar con FK)
-          message = 'No se puede realizar la operación debido a restricciones de la base de datos.';
-          status = HttpStatus.BAD_REQUEST;
-          break;
         case 'ER_NO_SUCH_TABLE': // 1146 (MySQL)
           message = isDevelopment 
             ? `Tabla no existe: ${(exception as any).sql}` 
@@ -86,7 +80,7 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
           status = HttpStatus.BAD_REQUEST;
       }
 
-      // 🔍 EN DESARROLLO: Agregar detalles del error
+      // EN DESARROLLO: Agregar detalles del error
       if (isDevelopment) {
         details = {
           code: (exception as any).code,
@@ -101,7 +95,7 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
       status = exception.getStatus();
       message = this.normalizeMessage(exception.getResponse());
       
-      // 🔍 EN DESARROLLO: Agregar stack trace
+      // EN DESARROLLO: Agregar stack trace
       if (isDevelopment && status >= 500) {
         details = {
           stack: (exception as any).stack,
@@ -110,7 +104,7 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
       }
 
     } else {
-      // 🚨 Errores no controlados
+      // Errores no controlados
       if (isDevelopment) {
         message = `Error no controlado: ${(exception as any)?.message || exception}`;
         details = {
@@ -121,13 +115,13 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
       }
     }
 
-    // 📋 Respuesta final
+    // Respuesta final
     const errorResponse: any = {
       statusCode: status,
       message: this.normalizeMessage(message),
     };
 
-    // ✅ Solo agregar detalles en desarrollo
+    // Solo agregar detalles en desarrollo
     if (isDevelopment && details) {
       errorResponse.details = details;
       errorResponse.timestamp = new Date().toISOString();

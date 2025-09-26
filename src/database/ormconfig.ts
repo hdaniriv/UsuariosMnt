@@ -1,25 +1,46 @@
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { UsuarioEntity } from './entities/usuario.entity';
-import { ProductoEntity } from './entities/producto.entity';
-import { ProductoCategoriaEntity } from './entities/productoCategoria.entity';
+import { TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { ConfigService } from "@nestjs/config";
 
-ConfigModule.forRoot({
-  isGlobal: true, // Hace que las variables estén disponibles globalmente
-  envFilePath: `.env.${process.env.NODE_ENV || 'development'}`, // Carga el archivo .env según el entorno
-});
+// Importar TODAS las entidades
+import { UsuarioEntity } from "./entities/usuario.entity";
+import { RoleEntity } from "./entities/role.entity";
+import { ProductoEntity } from "./entities/producto.entity";
+import { ProductoCategoriaEntity } from "./entities/productoCategoria.entity";
 
-const configService = new ConfigService();
+export const createOrmConfig = (
+  configService: ConfigService
+): TypeOrmModuleOptions => {
+  const isProduction = configService.get("NODE_ENV") === "production";
+  const isDevelopment = configService.get("NODE_ENV") === "development";
+  const isTest = configService.get("NODE_ENV") === "test";
 
-export const ormConfig = {
-  type: configService.get<string>('DB_TYPE') as 'mysql' | 'mariadb' | 'postgres' | 'cockroachdb' | 'sqlite' | 'mssql' | 'sap' | 'oracle' | 'cordova' | 'nativescript' | 'react-native' | 'sqljs' | 'mongodb' | 'aurora-mysql' | 'aurora-postgres' | 'expo' | undefined,
-  host: configService.get<string>('DB_HOST'),
-  port: configService.get<number>('DB_PORT'),
-  username: configService.get<string>('DB_USERNAME'),
-  password: configService.get<string>('DB_PASSWORD'),
-  database: configService.get<string>('DB_DATABASE'),
-  entities: [UsuarioEntity, ProductoEntity, ProductoCategoriaEntity],
-  autoLoadEntities: true,
-  synchronize: configService.get<string>('NODE_ENV') === 'development', // Solo habilita synchronize en desarrollo
-  logging: configService.get<boolean>('TYPEORM_LOGGING') || false, // Controla los logs desde .env
-} as TypeOrmModuleOptions;
+  return {
+    type: "mysql",
+    host: configService.get("DB_HOST"),
+    port: +configService.get("DB_PORT"),
+    username: configService.get("DB_USERNAME"),
+    password: configService.get("DB_PASSWORD"),
+    database: configService.get("DB_DATABASE"),
+
+    // Entidades centralizadas
+    entities: [
+      UsuarioEntity,
+      RoleEntity,
+      ProductoEntity,
+      ProductoCategoriaEntity,
+    ],
+
+   // Configuración esencial
+    synchronize: isDevelopment,
+    // logging: isDevelopment ? ["query", "error"] : false, // muestra queries SQL y consultas 
+    logging: isDevelopment ? ["error"] : false,
+    charset: "utf8mb4",
+
+    // Pool mínimo sin advertencias
+    extra: {
+      connectionLimit: 10,
+    },
+  };
+};
+
+
